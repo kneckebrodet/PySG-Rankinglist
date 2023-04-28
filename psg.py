@@ -1,4 +1,5 @@
 import PySimpleGUI as sg
+import time
 
 class RankingWindow:
     def __init__(self, data):
@@ -21,10 +22,11 @@ class RankingWindow:
         while True:
             event, values = self.window.read()
             if event == sg.WIN_CLOSED:
-                break
+                self.window.close()
+                return 1
             elif event == "New Game":
                 self.window.close()
-        self.window.close()
+
 
 class NewGameWindow:
     def __init__(self):
@@ -32,7 +34,7 @@ class NewGameWindow:
         self.game_layout = [
             [sg.Text("Enter your name:", font=("Helvetica", 50))],
             [sg.Multiline(key="name", pad=(0,(100,0)), size=(100,1), focus=True, font=("Helvetica", 120), no_scrollbar="true")],
-            [sg.Button("Start Game", button_color=('white', 'green'), size=(40, 3), pad=(0,(60,0)), font=("Helvetica", 14))]
+            [sg.Button("Start Game", button_color=('white', 'green'), size=(40, 3), pad=(0,(60,0)), font=("Helvetica", 14), bind_return_key=True)]
         ]
 
         self.window = sg.Window("New Game", self.game_layout, resizable=True, element_justification="c").finalize()
@@ -42,10 +44,33 @@ class NewGameWindow:
         while True:
             event, values = self.window.read()
             if event == sg.WIN_CLOSED:
+                self.window.close()
                 break
             elif event == "Start Game":
                 name = values["name"]
                 self.window.close()
                 return name
-                
+
         self.window.close()
+
+class CountdownWindow:
+    def __init__(self):
+        self.layout = [[sg.Text(key="time", font=("Arial", 400), pad=(25,0,0,0))]]
+
+        self.window = sg.Window("Countdown", self.layout, resizable=True, element_justification="c").finalize()
+        self.window.Maximize()
+
+
+    def run(self):
+        time_remaining = 10
+
+        while True:
+            event, values = self.window.read(timeout=1000)
+            time_remaining -= 1
+            self.window['time'].update(time_remaining)
+            if event == sg.WIN_CLOSED:
+                self.window.close()
+                break
+            if time_remaining == 0:
+                self.window.close()
+                break
